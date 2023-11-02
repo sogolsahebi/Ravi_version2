@@ -1,3 +1,0 @@
-WorkflowError in file C:\Users\sogol\OneDrive\Documents\BHK lab\Ravi\Ravi_version2\Snakefile.py, line 1:
-The Python 3 package 'boto3' needs to be installed to use S3 remote() file functionality. No module named 'boto3'
-  File "C:\Users\sogol\OneDrive\Documents\BHK lab\Ravi\Ravi_version2\Snakefile.py", line 1, in <module>
