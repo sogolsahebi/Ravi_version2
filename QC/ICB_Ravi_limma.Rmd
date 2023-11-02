@@ -1,0 +1,91 @@
+---
+title: "association between gene expression and immunotherapy response  using Limma approach"
+author: "Nasim"
+date: "2023-11-01"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+.
+```{r load library, include=FALSE}
+
+library(limma)
+library(ggplot2)
+library(readr)
+library(EnhancedVolcano)
+library(DT)
+library(MultiAssayExperiment)
+library(tibble)
+
+```
+
+
+
+```{r diff expression, include=TRUE, result = TRUE}
+mae <- readRDS("~/BHK lab/Ravi/Ravi_Test/data/result3.rds")
+
+#removing na in response and expression data
+
+na_rows <- is.na(mae$response)
+cleaned_response <- mae$response[!na_rows]
+cleaned_expr_data <- assays(mae)[["expr"]][, !na_rows]
+
+
+# 122 patient ate removing NA
+design <- model.matrix(~ cleaned_response)
+fit <- lmFit(cleaned_expr_data, design)
+fit <- eBayes(fit)
+
+#Top table only shows the top portion of the results
+topTable(fit)
+datatable(topTable(fit))
+
+
+```
+
+
+Preparing Data for volcano Plot 
+
+Convert fit to Data frame and add column gene_name symbol
+
+```{r prepare volcano, include=TRUE, result = TRUE}
+result <- topTable(fit, number=Inf)  # Get all results
+df <- as.data.frame(result)  # Convert to data frame
+
+#extract gene_name from mae ( it has gene_id column and gene_name)
+
+genedata<- data.frame(rowData(mae@ExperimentList$expr))
+
+#subset gene_id and gene_name from the gene_data
+
+subset_genedata <- genedata[, c("gene_id","gene_name" )]
+
+#mergeing process
+
+#add a gene_id column to result 
+result$gene_id <- rownames(result)
+#merge result and subset_genedata  by gene_id 
+
+merge_result <- merge(result, subset_genedata, by= "gene_id")
+
+datatable(merge_result)
+
+```
+
+Volcano Plot
+
+```{r volcan plot, include=TRUE, result = TRUE}
+
+
+
+EnhancedVolcano(merge_result,
+    lab = merge_result$gene_name,
+    x = 'logFC',
+    y = 'P.Value')
+
+```

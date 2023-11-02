@@ -1,0 +1,130 @@
+---
+title: "PCA Analysis on. Gene Expression Data"
+author: "Your Name"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Introduction
+
+This document presents a Principal Component Analysis (PCA) on gene expression data to assess variation across different centers.
+
+# Setup
+
+## Install and Load Libraries
+
+```{r libraries}
+# Install packages if not already installed
+#new_packages <- c("FactoMineR", "BiocManager", "ggplot2", "dplyr", "circlize", "RColorBrewer", "readr", "psych")
+#new_packages <- new_packages[!(new_packages %in% installed.packages()[,"Package"])]
+#if(length(new_packages)) install.packages(new_packages)
+
+# Load libraries
+library(FactoMineR)
+library(ComplexHeatmap)
+library(ggplot2)
+library(dplyr)
+library(circlize)
+library(RColorBrewer)
+library(readr)
+library(psych)
+
+# BiocManager for Bioconductor packages
+#if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+#BiocManager::install("ComplexHeatmap")
+```
+
+# Data Loading and Preparation
+
+## Load Gene Expression Data
+
+```{r load-expression-data}
+# Load your expression data 
+expr <- read_csv("~/BHK lab/Ravi/Ravi_Test/data/EXPR.csv")
+
+# Display first few rows of the dataset
+head(expr)
+```
+
+## Preprocess Expression Data
+
+```{r preprocess-expression-data}
+# Set row names and remove the first column
+expr <- data.frame(expr, check.names = FALSE)
+rownames(expr) <- expr[, 1]
+expr <- expr[, -1]
+```
+
+# Principal Component Analysis
+
+## Transpose Data for PCA
+
+```{r transpose-data}
+# Transpose the expr data frame so that samples are on rows and genes are on columns 
+expr_m <- t(expr)
+```
+
+## Perform PCA
+
+```{r perform-pca}
+# Calculate PCA 
+pc <- prcomp(expr_m, center = TRUE, scale. = FALSE)
+
+# Calculate and print the percentage of variance explained by each principal component
+var_res <- pc$sdev^2 / sum(pc$sdev^2) * 100
+var_res <- round(var_res, 2)  # Round to 2 decimal places
+print(var_res)
+```
+
+# Clinical Data Processing
+
+## Load Clinical Data
+
+```{r load-clinical-data}
+# Load clinical data
+CLIN <- read.csv("~/BHK lab/Ravi/Ravi_Test/data/CLIN.csv")
+CLIN <- CLIN[, c("patient","Institution")]
+```
+
+## Merge PCA and Clinical Data
+
+```{r merge-data}
+# Merge PCA results with clinical data
+pcx <- data.frame(pc$x)
+pcx$patient <- rownames(pcx)
+pcx_merge <- merge(pcx, CLIN, by="patient")
+rownames(pcx_merge) <- pcx_merge[,1]
+pcx_merge <- pcx_merge[,-1] # institution column is added
+```
+
+# Visualization
+
+## Bar Plot
+
+```{r scree-plot}
+#To find the largest PC of data
+# Create a bar plot
+barplot(var_res, main="Bar Plot", xlab="Principal Component", ylab="Percentage of Variance Explained", col="skyblue")
+```
+
+## PCA Results Plot
+
+```{r pca-results-plot}
+# Create labels for the plot
+xlab_text <- paste("PC1 (", var_res[1], "%)", sep = "")
+ylab_text <- paste("PC2 (", var_res[2], "%)", sep = "")
+
+# Plot PCA results
+ggplot(pcx_merge, aes(PC1, PC2, color = Institution)) +
+  theme_bw() +
+  geom_point() +
+  labs(x = xlab_text, y = ylab_text)
+```
+
+
