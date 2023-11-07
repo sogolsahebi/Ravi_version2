@@ -1,8 +1,10 @@
 ---
-title: 'QC Analysis of ICB_Ravi mae'
+title: "QC Analysis of ICB_Ravi mae"
 author: "Nasim"
 date: "2023-11-07"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -19,7 +21,7 @@ Principal Component Analysis (PCA) on gene expression data to assess variation a
 
 ```{r libraries}
 # Install packages if not already installed
-#new_packages <- c("FactoMineR", "BiocManager", "ggplot2", "dplyr", "circlize", "RColorBrewer", "readr", "psych")
+#new_packages <- c("FactoMineR", "BiocManager", "ggplot2", "dplyr", "circlize", "RColorBrewer", "readr", "psych", "dplyr")
 #new_packages <- new_packages[!(new_packages %in% installed.packages()[,"Package"])]
 #if(length(new_packages)) install.packages(new_packages)
 
@@ -32,7 +34,14 @@ library(circlize)
 library(RColorBrewer)
 library(readr)
 library(psych)
-library(dplyr)
+library(MultiAssayExperiment) 
+library(limma)
+library(EnhancedVolcano)
+library(DT)
+library(tibble)
+
+
+
 
 
 # BiocManager for Bioconductor packages
@@ -129,17 +138,6 @@ ggplot(pcx_merge, aes(PC1, PC2, color = Institution)) +
 
 #2.Limma approach and Volcano plot 
 
-```{r load library, include=FALSE}
-
-library(limma)
-library(ggplot2)
-library(readr)
-library(EnhancedVolcano)
-library(DT)
-library(MultiAssayExperiment)
-library(tibble)
-
-```
 
 
 
@@ -211,7 +209,7 @@ Volcano Plot2.
 
 plot Volacnot plot based on "FDR"
 
-```{r volcan plot, include=TRUE, result = TRUE}
+```{r volcanplot2, include=TRUE, result = TRUE}
 
 
 
@@ -233,7 +231,6 @@ First 1.(a)_RNA cohort in different institutions.
 clin <- data.frame(colData(mae))
 clin_subset <-clin[,c("Institution","rna")]
 
-library(ggplot2)
 
 # Counting the occurrences of each institution
 institution_counts <- table(clin_subset$Institution)
@@ -260,14 +257,6 @@ Figure 1(b):BOR/recist by PDL1 TPS category.
 
 
 ```{r bar plot, include=TRUE, result = TRUE}
-# Install dplyr if you haven't already
-#install.packages("dplyr")
-#library(dplyr)
-
-# No need to run library(dplyr), you can use dplyr functions directly with dplyr::
-
-# Example usage of dplyr::count
-# Assuming 'data'
 
 
 # Convert colData from MultiAssayExperiment to a data frame
@@ -285,9 +274,8 @@ data$PDL1_TPS_Description <- factor(data$PDL1_TPS_Description, levels = c("<1%",
 data$recist <- forcats::fct_explicit_na(data$recist, na_level = "NE")
 
 
-
+library(dplyr)
 # Count the occurrences of combinations of 'PDL1_TPS_Description' and 'recist'
-
 counted_data <- count(data, PDL1_TPS_Description, recist)
 
 # Group by 'PDL1_TPS_Description'
@@ -296,6 +284,7 @@ grouped_data <- group_by(counted_data, PDL1_TPS_Description)
 # Calculate frequencies
 data_summary <- mutate(grouped_data, freq = n / sum(n))
 
+library(ggplot2)
 # Plotting
 ggplot(data_summary, aes(x = PDL1_TPS_Description, y = freq, fill = recist)) +
   geom_bar(stat = "identity") +
