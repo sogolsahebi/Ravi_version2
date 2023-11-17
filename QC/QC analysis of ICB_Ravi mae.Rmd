@@ -1,10 +1,11 @@
 ---
 title: "QC Analysis of ICB_Ravi mae"
-author: "Nasim"
+author: "Nasim Bondar Sahebi"
 date: "2023-11-07"
 output:
   html_document: default
   pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -26,11 +27,11 @@ Principal Component Analysis (PCA) on gene expression data to assess variation a
 #if(length(new_packages)) install.packages(new_packages)
 
 # Load libraries
-library(FactoMineR)
-library(ComplexHeatmap)
+#library(FactoMineR)
+#library(ComplexHeatmap)
 library(ggplot2)
 library(dplyr)
-library(circlize)
+#library(circlize)
 library(RColorBrewer)
 library(readr)
 library(psych)
@@ -39,8 +40,6 @@ library(limma)
 library(EnhancedVolcano)
 library(DT)
 library(tibble)
-
-
 
 
 
@@ -53,12 +52,40 @@ library(tibble)
 
 ## Load Gene Expression Data
 
+Certainly! Here's a cleaned-up version of the comments before the code chunk in your R Markdown file:
+
+---
+
+### Load Gene Expression Data
+
+#### Data Overview
+
+- **Study Reference**: [PubMed ID 37024582](https://pubmed.ncbi.nlm.nih.gov/37024582/)
+- **Patient Count (RNA)**: 152
+- **Treatment Details**:
+  - **PD-1/PD-L1**: 130 patients
+  - **IO+chemo**: 2 patients
+  - **IO+combo**: 16 patients
+  - **Not Available (NA)**: 4 patients
+
+The data includes detailed treatment information for 152 patients, with a focus on those treated with immunotherapy and chemotherapy. 
+
+The following R script will load the multiassay result file and extract clinical data, expression data, and annotations.This section loads and prepares gene expression data for analysis
+
 ```{r load-expression-data}
-# Load your multiassay result and extract expression data 
+# Load your multiassay result and extract clinical data , expression data and annotation
 
-mae <- readRDS("~/BHK lab/Ravi_version2/data/ICB_Ravi.rds")
+#load mae obj
+mae <- readRDS("~/BHK lab/Ravi_version2/data/ICB_Ravii.rds")
 
+#extract Clinical data 
+clin <- data.frame(colData(mae))
+
+#extract the expression data
 expr <- assays(mae)[["expr"]]
+
+#extracting the annotation 
+annot <- data.frame(rowData(mae@ExperimentList$expr))
 
 # Display first few rows of the dataset
 head(expr)
