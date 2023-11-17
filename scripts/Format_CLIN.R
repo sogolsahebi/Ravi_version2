@@ -5,7 +5,7 @@
 source("https://raw.githubusercontent.com/BHKLAB-Pachyderm/ICB_Common/main/code/Get_Response.R")
 source("https://raw.githubusercontent.com/BHKLAB-Pachyderm/ICB_Common/main/code/format_clin_data.R")
 source("https://raw.githubusercontent.com/BHKLAB-Pachyderm/ICB_Common/main/code/annotate_tissue.R")
-source("https://raw.githubusercontent.com/BHKLAB-Pachyderm/ICB_Common/main/code/annotate_drug.R")
+
 
 #read library tibble for add_column function
 library(tibble)
@@ -19,8 +19,8 @@ annot_dir <- args[3]
 
 
 # Data Loading
-# Define the path to the source data.
-#file_path <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/Ravi_version2/data/CLIN.txt"
+#Define the path to the source data.
+#file_path <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/deleted repo/Ravi_version2/data/CLIN.txt"
 #clin_merge_data <- read.csv( file_path , stringsAsFactors=FALSE , sep="\t" )
 
 # Load the clinical merged data from the given file path.
@@ -62,7 +62,8 @@ clin$stage <- ifelse(clin$stage == 1, "I",
 
 # Assign 'tpm' and 'wes' values based on RNA_All and WES_All respectively.
 clin$rna <- ifelse(clin_merge_data$RNA_All == 1, "tpm", NA)
-clin$dna <- ifelse(clin_merge_data$WES_All == 1, "wes", NA)
+clin$dna <- NA
+
 
 # Calculate the response using Get_Response function.
 clin$response = Get_Response(data = clin)
@@ -80,7 +81,7 @@ clin <- clin[, c(
 clin <- format_clin_data(clin_merge_data, "patient", selected_cols, clin)
 
 #add survival_unit and survival_type columns. and use  'curation_tissue.csv' file to set clin$tissueid column
-#annotation_tissue <- read.csv("~/BHK lab/Ravi/Ravi_version2/Common files/curation_tissue.csv")
+#annotation_tissue <- read.csv("~/BHK lab/Ravi/deleted repo/Ravi_version2/Common files/curation_tissue.csv")
 annotation_tissue<- file.path(annot_dir, 'curation_tissue.csv')
 
 clin <- annotate_tissue(clin=clin, study='Ravi', annotation_tissue=annotation_tissue, check_histo=FALSE)
@@ -90,7 +91,6 @@ clin <- add_column(clin, treatmentid= clin$Agent_PD1, .after='tissueid')
 
 
 # Adding drug_type based on treatmentid.
-
 # Print unique values of treatmentid.
 print(unique(clin$treatmentid))
 
@@ -105,8 +105,11 @@ print(unique(clin$drug_type))
 # Replace empty string values with NA.
 clin[clin == ""] <- NA
 
+# Replace hyphens in the row names of 'clin' with underscores
+rownames(clin) <- str_replace_all(rownames(clin), '-', '_')
+
 # Save the processed data as CLIN.csv file
-#file <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/Ravi_version2/data/CLIN.csv"
+#file <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/deleted repo/Ravi_version2/data/CLIN.csv"
 #write.csv(clin, file, row.names = TRUE)
 
 write.csv(clin , file=file.path(output_dir, "CLIN.csv") , row.names=TRUE )

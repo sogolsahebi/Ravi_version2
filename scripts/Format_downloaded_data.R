@@ -8,6 +8,8 @@
 # Load necessary libraries.
 #install.packages("CePa")
 #install.packages("Rgraphviz")
+#install.packages("readxl")
+library(readxl)
 library(CePa)
 
 
@@ -18,16 +20,16 @@ work_dir <- args[1]
 
 # Alternatively, set file paths directly
 #file_path1 <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/Source Data/Source Data/Clinical/SU2C-MARK_Harmonized_Clinical_Annotations_Supplement_v1.txt"
-#file_path2 <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/Source Data/Source Data/Clinical/Table_S1_Clinical_Annotations.(csv).csv"
+#file_path2 <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/Source Data/Source Data/Clinical/Table_S1_Clinical_Annotations.xlsx"
 
 file_path1 <- file.path(work_dir,"SU2C-MARK_Harmonized_Clinical_Annotations_Supplement_v1.txt" )
-file_path2 <- file.path(work_dir,"Table_S1_Clinical_Annotations.csv" )
-
+file_path2 <- file.path(work_dir,"Table_S1_Clinical_Annotations.xlsx" )
 
 # STEP 1: Create "CLIN.txt" file
 # Load clinical data
 clin_data1 <- read.table(file_path1, header = TRUE, sep = "\t")
-clin_data2 <- read.csv(file_path2)
+clin_data2 <- read_excel(file_path2, col_names = FALSE)
+
 
 # Quick data overview for accuracy
 head(clin_data1)
@@ -35,10 +37,10 @@ dim(clin_data1)
 head(clin_data2)
 dim(clin_data2)
 
-
-# Clean clinical data
-colnames(clin_data2) <- clin_data2[2,]
-clin_data2 <- clin_data2[-c(1,2),]
+# Clean clinical data, Set row 3 as column names  
+colnames(clin_data2) <- clin_data2[3, ]
+# Remove the first 3 rows
+clin_data2 <- clin_data2[-(1:3), ]
 
 
 # Merge clinical data
@@ -72,7 +74,7 @@ colnames(clin_merge_data)[colnames(clin_merge_data) == "Harmonized_SU2C_Particip
 
 
 # Save merged clinical data
-#write.table(clin_merge_data, "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/Ravi_version2/data/CLIN.txt", sep = "\t", row.names = TRUE)
+#write.table(clin_merge_data, "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/deleted repo/Ravi_version2/data/CLIN.txt", sep = "\t", row.names = TRUE)
 write.table(clin_merged_data, file=file.path(work_dir, 'CLIN.txt'), quote=FALSE , sep="\t" , col.names=TRUE , row.names=FALSE)
 
 
@@ -83,10 +85,8 @@ write.table(clin_merged_data, file=file.path(work_dir, 'CLIN.txt'), quote=FALSE 
 
 gct_file_path <- file.path(work_dir,"SU2C-MARK_Harmonized_rnaseqc_tpm_v1.gct" )
 
-
 # Load expression data
 expr <- data.frame(read.gct(gct_file_path))
-
 
 # Clean expression data
 # 1. Replace periods with hyphens
@@ -94,7 +94,6 @@ expr <- data.frame(read.gct(gct_file_path))
 new_colnames <- gsub("\\.", "-", colnames(expr))
 new_colnames <- gsub("-T1$|-T2$", "", new_colnames)
 colnames(expr) <- new_colnames
-
 
 # Check for any duplicate column names after renaming
 duplicate_colnames <- colnames(expr)[duplicated(colnames(expr))]
@@ -107,9 +106,9 @@ expr <- expr[sort(rownames(expr)),]
 # Confirm that all column values are numeric
 stopifnot(all(sapply(expr, is.numeric)))
 
-# Open a gzipped file for writing
-#gz <- gzfile("C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/Ravi_version2/data/EXPR.txt.gz", "w")
 
+# Open a gzipped file for writing
+#gz <- gzfile("C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/deleted repo/Ravi_version2/data/EXPR.txt.gz", "w")
 
 gz <- gzfile(file.path(work_dir, 'EXPR.txt.gz'), "w")
 

@@ -1,4 +1,4 @@
-# Set the file path for the clinical merged data
+# Set the file path for the clinical merged data.
 
 # Parse command line arguments for input, output, and annotation directory paths.
 args <- commandArgs(trailingOnly = TRUE)
@@ -7,7 +7,7 @@ output_dir <- args[2]
 
 
 # Load the clinical merged data from the specified file path.
-#path <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/Ravi_version2/data/CLIN.txt"
+#path <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/deleted repo/Ravi_version2/data/CLIN.txt"
 #clin <- read.delim(path)
 
 clin <- read.delim(file.path(input_dir, "CLIN.txt"))
@@ -27,7 +27,7 @@ case$expr <- as.numeric(as.character(case$expr))
 
 
 # Load the RNA data
-#path <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/Ravi_version2/data/EXPR.txt.gz"
+#path <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/deleted repo/Ravi_version2/data/EXPR.txt.gz"
 #expr <- read.csv(path, stringsAsFactors=FALSE , sep="\t" )
 
 # Read the RNA-Seq data from the gct file.
@@ -37,7 +37,7 @@ dim(expr)
 colnames(expr)
 
 # 1. Replace periods with hyphens
-new_colnames <- gsub("\\.", "-", colnames(expr))
+new_colnames <- gsub("\\.", "_", colnames(expr))
 colnames(expr) <- new_colnames
 
 
@@ -63,7 +63,7 @@ for(i in 1:nrow(case)) {
 }
 
 # Save the updated 'case' data frame to a CSV file
-#path <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/Ravi_version2/data/cased_sequenced.csv"
+#path <- "C:/Users/sogol/OneDrive/Documents/BHK lab/Ravi/deleted repo/Ravi_version2/data/cased_sequenced.csv"
 #write.table( case , path , quote=FALSE , sep=";" , col.names=TRUE , row.names=FALSE )
 
 write.table( case , file=file.path(output_dir, "cased_sequenced.csv") , quote=FALSE , sep=";" , col.names=TRUE , row.names=FALSE )
