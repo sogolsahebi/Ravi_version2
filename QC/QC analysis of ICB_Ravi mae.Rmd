@@ -3,8 +3,8 @@ title: "QC Analysis of ICB_Ravi mae"
 author: "Nasim Bondar Sahebi"
 date: "2023-11-07"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
   word_document: default
 ---
 
