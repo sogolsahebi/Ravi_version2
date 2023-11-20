@@ -18,22 +18,15 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```{r libraries}
 
 # Load libraries
-#library(FactoMineR)
-#library(ComplexHeatmap)
 library(ggplot2)
 library(dplyr)
-#library(circlize)
-library(RColorBrewer)
-library(readr)
-library(psych)
 library(MultiAssayExperiment) 
 library(limma)
 library(EnhancedVolcano)
 library(DT)
-library(tibble)
-library(forcats)
 
 ```
+
 
 # Data Loading and Preparation
 
