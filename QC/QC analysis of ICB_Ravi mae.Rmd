@@ -52,10 +52,6 @@ library(tibble)
 
 ## Load Gene Expression Data
 
-Certainly! Here's a cleaned-up version of the comments before the code chunk in your R Markdown file:
-
----
-
 ### Load Gene Expression Data
 
 #### Data Overview
