@@ -24,6 +24,8 @@ library(MultiAssayExperiment)
 library(limma)
 library(EnhancedVolcano)
 library(DT)
+library(RColorBrewer)
+library(readr)
 
 ```
 
